@@ -3,18 +3,18 @@ import TastytradeHttpClient from "../../../lib/services/tastytrade-http-client"
 import SessionService from "../../../lib/services/session-service"
 import _ from 'lodash'
 
-const client = new TastytradeHttpClient(process.env.BASE_URL!)
+const client = new TastytradeHttpClient(process.env.BASE_URL || '')
 const instrumentsService = new InstrumentsService(client)
 
 beforeAll(async () => {
   const sessionService = new SessionService(client)
-  await sessionService.login(process.env.API_USERNAME!, process.env.API_PASSWORD!)
+  await sessionService.login(process.env.API_USERNAME || '', process.env.API_PASSWORD || '')
 });
 
 describe('getCryptocurrencies', () => {
   it('responds with the correct data', async function() {
     const response = await instrumentsService.getCryptocurrencies()
-    expect(response).toBeDefined();
+    expect(response.ok).toBe(true)
   })
 })
 
@@ -23,6 +23,7 @@ describe('getSingleCryptocurrency', () => {
     const cryptocurrencySymbol = 'BTC/USD'
     const response = await instrumentsService.getSingleCryptocurrency(cryptocurrencySymbol)
     expect(response.symbol).toBe(cryptocurrencySymbol)
+    expect(response.ok).toBe(true)
   })
 })
 
@@ -30,7 +31,8 @@ describe('getSingleEquity', () => {
   it('responds with the correct data', async function() {
     const equitySymbol = 'AAPL'
     const response = await instrumentsService.getSingleEquity(equitySymbol)
-    expect(response).toBeDefined()
+    expect(response.ok).toBe(true)
+      expect(response.symbol).toBe(equitySymbol)
     expect(response.symbol).toBe(equitySymbol)
   })
 })
@@ -38,7 +40,8 @@ describe('getSingleEquity', () => {
 describe('getFutureOptionsProducts', () => {
     it('responds with the correct data', async function() {
       const response = await instrumentsService.getFutureOptionsProducts()
-      expect(response.length).toBeGreaterThan(0);
+      expect(response.ok).toBe(true)
+      expect(response.length).toBeGreaterThan(0)
       expect(response).toBeDefined();
     })
 })
@@ -46,13 +49,14 @@ describe('getFutureOptionsProducts', () => {
 describe('getSingleFutureOptionProduct', () => {
   it('responds with the correct data', async function() {
     const response = await instrumentsService.getSingleFutureOptionProduct('CME', 'ES')
-    expect(response).toBeDefined()
+    expect(response.ok).toBe(true)
   })
 })
 
 describe('getFuturesProducts', () => {
     it('responds with the correct data', async function() {
       const response = await instrumentsService.getFuturesProducts()
+      expect(response.ok).toBe(true)
       expect(response.length).toBeGreaterThan(0)
     })
 })
@@ -60,6 +64,7 @@ describe('getFuturesProducts', () => {
 describe('getSingleFutureProduct', () => {
   it('responds with the correct data', async function() {
     const response = await instrumentsService.getSingleFutureProduct('CME', 'ES')
+    expect(response.ok).toBe(true)
     expect(response.exchange).toBe('CME')
     expect(response.code).toBe('ES')
   })
@@ -68,7 +73,8 @@ describe('getSingleFutureProduct', () => {
 describe('getQuantityDecimalPrecisions', () => {
     it('responds with the correct data', async function() {
       const response = await instrumentsService.getQuantityDecimalPrecisions()
-      expect(response.length).toBeGreaterThan(0);
+      expect(response.ok).toBe(true)
+    expect(response.length).toBeGreaterThan(0)
       const btcPrecision = _.filter(response, item => item.symbol === 'BTC/USD')
       expect(_.isNil(btcPrecision)).toBeFalsy()
     })
@@ -85,5 +91,6 @@ describe('getNestedOptionChain', () => {
     const optionStrike = _.first(optionExpiration.strikes) as any
     const equityOption = await instrumentsService.getSingleEquityOption(optionStrike.call)
     expect(equityOption.symbol).toBe(optionStrike.call)
+    expect(equityOption.ok).toBe(true)
   })
 })
