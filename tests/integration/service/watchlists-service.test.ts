@@ -5,7 +5,7 @@ import SessionService from "../../../lib/services/session-service";
 const client = new TastytradeHttpClient(process.env.BASE_URL!)
 const watchlistsService = new WatchlistsService(client)
 
-beforeAll(async () => {
+beforeEach(async () => {
   const sessionService = new SessionService(client)
   await sessionService.login(process.env.API_USERNAME!, process.env.API_PASSWORD!)
 });
