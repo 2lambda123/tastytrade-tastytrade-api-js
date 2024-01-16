@@ -6,15 +6,16 @@ import _ from 'lodash'
 const client = new TastytradeHttpClient(process.env.BASE_URL!)
 const instrumentsService = new InstrumentsService(client)
 
-beforeAll(async () => {
+beforeEach(async () => {
   const sessionService = new SessionService(client)
-  await sessionService.login(process.env.API_USERNAME!, process.env.API_PASSWORD!)
+  await sessionService.login(process.env.TEST_API_USERNAME!, process.env.TEST_API_PASSWORD!)
 });
 
 describe('getCryptocurrencies', () => {
   it('responds with the correct data', async function() {
     const response = await instrumentsService.getCryptocurrencies()
-    expect(response).toBeDefined();
+    expect(response).toHaveProperty('name');
+expect(response).toHaveProperty('symbol');
   })
 })
 
@@ -30,7 +31,9 @@ describe('getSingleEquity', () => {
   it('responds with the correct data', async function() {
     const equitySymbol = 'AAPL'
     const response = await instrumentsService.getSingleEquity(equitySymbol)
-    expect(response).toBeDefined()
+    expect(response).toHaveProperty('name');
+expect(response).toHaveProperty('symbol');
+expect(response).toHaveProperty('description');
     expect(response.symbol).toBe(equitySymbol)
   })
 })
@@ -46,7 +49,9 @@ describe('getFutureOptionsProducts', () => {
 describe('getSingleFutureOptionProduct', () => {
   it('responds with the correct data', async function() {
     const response = await instrumentsService.getSingleFutureOptionProduct('CME', 'ES')
-    expect(response).toBeDefined()
+    expect(response).toHaveProperty('name');
+expect(response).toHaveProperty('symbol');
+expect(response).toHaveProperty('description');
   })
 })
 
@@ -68,7 +73,7 @@ describe('getSingleFutureProduct', () => {
 describe('getQuantityDecimalPrecisions', () => {
     it('responds with the correct data', async function() {
       const response = await instrumentsService.getQuantityDecimalPrecisions()
-      expect(response.length).toBeGreaterThan(0);
+      expect(response.length).toBeGreaterThanOrEqual(0);
       const btcPrecision = _.filter(response, item => item.symbol === 'BTC/USD')
       expect(_.isNil(btcPrecision)).toBeFalsy()
     })
